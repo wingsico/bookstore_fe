@@ -1,5 +1,7 @@
 # bookstore_fe
 
+网上书店系统 前端
+
 ## Project setup
 ```
 npm install
