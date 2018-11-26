@@ -1,0 +1,10 @@
+{
+  "status": 200,
+  "message": "ok",
+  "data": {
+    "user_id": "@id()",
+    "nickname": "@name()",
+    "username": "@word()",
+    "deposit": "@float(100, 1000, 0, 2)"
+  }
+}

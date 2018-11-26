@@ -12,8 +12,11 @@ module.exports = {
   // useBuildIns: 'usage|entry|false', 默认值 usage. 当传入entry，需要在main.js中引入 @babel/polyfill (这会增大包体积)
   plugins: [
     [
-      'import',
-      { libraryName: 'vant', libraryDirectory: 'es', style: true },
+      'import', {
+        libraryName: 'vant',
+        libraryDirectory: 'es',
+        style: true,
+      },
       'vant',
     ],
   ],
