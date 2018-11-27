@@ -1,6 +1,6 @@
 <template>
   <div class="login-page">
-    <van-nav-bar
+    <nav-bar
       title="书虫屋登陆"
       left-arrow
       @click-left="handleBackClick"
@@ -27,8 +27,8 @@ export default {
     }
   },
   components: {
-    [NavBar.name]: NavBar,
-    [LoginForm.name]: LoginForm,
+    NavBar,
+    LoginForm,
   },
 };
 </script>

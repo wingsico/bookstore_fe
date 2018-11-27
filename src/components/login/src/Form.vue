@@ -1,7 +1,7 @@
 <template>
   <div class="login-form">
-    <van-cell-group>
-      <van-field
+    <cell-group>
+      <field
         v-model="username"
         clearable
         label="用户名"
@@ -9,13 +9,13 @@
         placeholder="请输入用户名"
       />
 
-      <van-field
+      <field
         v-model="password"
         type="password"
         label="密码"
         placeholder="请输入密码"
       />
-    </van-cell-group>
+    </cell-group>
   </div>
 </template>
 
@@ -31,8 +31,8 @@ export default {
     }
   },
   components: {
-    [Field.name]: Field,
-    [CellGroup.name]: CellGroup,
+    Field,
+    CellGroup,
   },
 }
 </script>
