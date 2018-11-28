@@ -1,17 +1,19 @@
 <template>
   <div class="login-page">
-    <nav-bar
-      title="书虫屋登陆"
-      left-arrow
+    <van-nav-bar
       @click-left="handleBackClick"
-    />
+    >
+      <div class="title" slot="title">书虫屋登录</div>
+      <van-icon name="arrow-left" slot="left" color="#333" />
+    </van-nav-bar>
     <login-form />
+    <login-footer />
   </div>
 </template>
 
 <script>
-import { NavBar } from 'vant';
-import { LoginForm } from '@/components/login';
+import { NavBar, Icon } from 'vant';
+import { LoginForm, LoginFooter } from '@/components/login';
 
 export default {
   name: 'login-page',
@@ -27,11 +29,16 @@ export default {
     }
   },
   components: {
-    NavBar,
+    [NavBar.name]: NavBar,
+    [Icon.name]: Icon,
     LoginForm,
+    LoginFooter,
   },
 };
 </script>
 
-<style lang="sass" scoped>
+<style lang="scss" scoped>
+.title {
+  font-weight: 400;
+}
 </style>

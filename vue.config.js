@@ -6,6 +6,12 @@ module.exports = {
   devServer: {
     before: MockServer,
   },
+  pages: {
+    index: {
+      title: '书虫屋',
+      entry: 'src/main.js',
+    }
+  },
   chainWebpack: (config) => {
     config.resolve.alias
       .set('@', resolve('src'))
