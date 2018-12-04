@@ -7,7 +7,7 @@ const install = Vue => {
   install.installed = true;
 
   Object.defineProperties(Vue.prototype, {
-    '$api': {
+    $api: {
       get() {
         return apiExporter;
       },

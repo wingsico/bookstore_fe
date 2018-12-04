@@ -8,7 +8,7 @@ module.exports = {
   },
   pages: {
     index: {
-      title: '书虫屋',
+      title: '木迹',
       entry: 'src/main.js',
     }
   },

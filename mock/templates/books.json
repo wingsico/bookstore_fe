@@ -1,0 +1,19 @@
+{
+  "status": 200,
+  "message": "ok",
+  "data": {
+    "pageSize": 20,
+    "page": 1,
+    "totalPage": 40,
+    "books|20": [
+      {
+        "book_id": "@id()",
+        "title": "@csentence(5, 20)",
+        "author": "@name()",
+        "price": "@float(5, 60, 0, 2)",
+        "type": "@cword(2)",
+        "cover": "@image('90x90')"
+      }
+    ]
+  }
+}

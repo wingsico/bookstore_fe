@@ -1,0 +1,16 @@
+{
+  "status": 200,
+  "message": "ok",
+  "data": {
+      "book_id": "@id()",
+      "title": "@ctitle(5, 10)",
+      "author": "@cname()",
+      "price": "@float(5, 60, 0, 2)",
+      "type": "@csentence(2)",
+      "cover": "@image('90x90')",
+      "info": "@csentence(70, 200)",
+      "publish_date": "@date('T')",
+      "press": "@cname()",
+      "author_info": "@csentence(50, 100)"
+  }
+}

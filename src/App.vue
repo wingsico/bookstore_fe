@@ -4,6 +4,7 @@
   </div>
 </template>
 
+
 <style lang="scss">
 *,
 *::before,
@@ -13,8 +14,16 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   height: 100%;
 }
 
+[class*="van-hairline"]::after {
+  border-color: #ddd !important;
+}
+
+.van-nav-bar__title {
+  font-weight: 400 !important;
+}
 </style>

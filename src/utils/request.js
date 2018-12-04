@@ -1,6 +1,9 @@
 import axios from 'axios';
 import { Toast } from 'vant';
 
+Toast.setDefaultOptions({
+  duration: 1000,
+})
 
 const codeMessage = {
   200: '请求成功',
@@ -68,29 +71,28 @@ export default function request(url, options) {
 
       if (!response) {
         Toast.fail(codeMessage[504]);
-        return {
-          statusText: 'error',
-        };
       }
 
       const { status, data } = response;
       const errorMessage = data.message || data.error || codeMessage[status];
+      e.message = errorMessage;
+
       if (status === 401) {
-        Toast.fail(errorMessage);
-        return null;
+
       }
       if (status === 404) {
-        const method = (options && options.method) || 'GET';
-        console.error(`${method} ${url} error:${errorMessage}`);
-        Toast.fail(errorMessage);
-        return e.response;
+
       }
       if (status > 401 || status === 400) {
-        Toast.fail(errorMessage);
-        return e.response;
+
       }
 
-      return e;
+      Toast.fail({
+        message: errorMessage,
+        duration: 3000,
+      });
+
+      throw e;
     });
 }
 

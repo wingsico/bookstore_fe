@@ -2,7 +2,7 @@
   <div class="login-footer" v-once>
     <h4 class="team-title">团队成员</h4>
     <div class="team-container">
-      <avatar
+      <CommonAvatar
         v-for="person in team"
         :key="person.name"
         :src="person.avatar"
@@ -15,7 +15,6 @@
 </template>
 
 <script>
-import { Avatar } from '@/components/common';
 
 export default {
   name: "login-footer",
@@ -42,9 +41,6 @@ export default {
       }]
     };
   },
-  components: {
-    Avatar,
-  }
 };
 </script>
 

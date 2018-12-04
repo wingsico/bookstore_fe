@@ -5,3 +5,11 @@ export function registerComponents(componentObject = {}) {
     };
   });
 }
+
+export function encrypt(str = "") {
+  return str.split('').reverse().map(c => String.fromCharCode(c.charCodeAt() + 10)).join("")
+}
+
+export function decrypt(str = "") {
+  return str.split('').reverse().map(c => String.fromCharCode(c.charCodeAt() - 10)).join("");
+}
