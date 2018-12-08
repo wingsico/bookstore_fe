@@ -2,15 +2,17 @@
   "status": 200,
   "message": "ok",
   "data": {
-      "book_id": "@id()",
+    "book": {
+      "id": "@id()",
       "title": "@ctitle(5, 10)",
       "author": "@cname()",
       "price": "@float(5, 60, 0, 2)",
-      "type": "@csentence(2)",
-      "cover": "@image('90x90')",
-      "info": "@csentence(70, 200)",
-      "publish_date": "@date('T')",
+      "classification": "@cword(2)",
+      "cover_url": "@image('375x375')",
+      "content": "@csentence(70, 200)",
+      "publish_date": "@datetime()",
       "press": "@cname()",
-      "author_info": "@csentence(50, 100)"
+      "author_intro": "@csentence(50, 100)"
+    }
   }
 }

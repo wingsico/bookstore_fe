@@ -1,8 +1,22 @@
 <template>
   <div id="app">
-    <router-view/>
+    <keep-alive>
+      <router-view />
+    </keep-alive>
   </div>
 </template>
+
+<script>
+import {mapActions} from 'vuex';
+export default {
+  methods: {
+    ...mapActions(['getClassifications'])
+  },
+  created() {
+    this.getClassifications();
+  }
+}
+</script>
 
 
 <style lang="scss">
@@ -19,11 +33,12 @@ body {
   height: 100%;
 }
 
-[class*="van-hairline"]::after {
+[class*="van-hairline"]:not([class*="van-tag"])::after {
   border-color: #ddd !important;
 }
 
 .van-nav-bar__title {
   font-weight: 400 !important;
 }
+
 </style>

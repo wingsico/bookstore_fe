@@ -28,7 +28,7 @@
               <UserCellItem name="debit-pay" color="gold" text="待付款" to="/user/order/pay_list"/>
             </van-col>
             <van-col span="8" class="col">
-              <UserCellItem name="cash-on-deliver" color="gold" text="待收货" to="/user/order/get_list"/>
+              <UserCellItem name="cash-on-deliver" color="gold" text="待收货" @click="handleNoService" />
             </van-col>
             <van-col span="8" class="col">
               <UserCellItem name="goods-collect" color="gold" text="已完成" to="/user/order/finish_list"/>
@@ -37,6 +37,10 @@
               <UserCellItem name="description" color="red" text="全部订单" to="/user/order/all_list"/>
             </van-col>
           </van-row>
+        </div>
+        <div class="recommends-wrapper">
+        <CommonRecommendList />
+
         </div>
       </div>
     </CommonNavbarLayout>
@@ -58,22 +62,30 @@ export default {
       return this.$route.fullPath !== '/user'
     }
   },
-  mounted() {
-    if (isEmpty(this.user)) {
-      this.$router.replace("/login");
-    }
-  },
   methods: {
     handleBackClick() {
       this.$router.go(-1);
+    },
+    handleNoService(e) {
+      this.$toast('暂无此服务')
     }
   },
+  created() {
+    if (isEmpty(this.user)) {
+      this.$router.replace('/login');
+    }
+  }
 };
 </script>
 
 <style lang="scss" scoped>
 .user-page {
   .container {
+    background-color: #f7f7f7;
+    .recommends-wrapper {
+      padding: 0 10px 10px;
+      background-color: #fff;
+    }
     .cell-group {
       height: 72px;
       background: #fff;

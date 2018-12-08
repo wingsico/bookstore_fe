@@ -10,8 +10,7 @@
             <div class="user-avatar">{{ AvatarChar }}</div>
             <div class="user-profile">
               <p class="user-id">
-                <span class="label">mj_</span>
-                {{ user.user_id }}
+                <span class="label">mj_{{ user.id }}</span>
               </p>
               <p class="nickname">
                 <span class="label">用户名：</span>
@@ -21,7 +20,6 @@
           </div>
         </van-cell>
         <van-cell title="修改支付密码" is-link to="/user/pay_pwd_change"/>
-        <van-cell title="修改登录密码" is-link to="/user/user_pwd_change"/>
         <van-cell title="修改昵称" is-link to="/user/nickname_change" :value="user.nickname"/>
       </van-cell-group>
       <footer>

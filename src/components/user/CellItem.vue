@@ -1,21 +1,23 @@
 <template>
-  <router-link class="cell-item" :to="to" tag="div">
+  <div class="cell-item" @click="routerGo">
     <van-icon :name="name" :size="size" :color="color" />
     <span class="text">{{ text }}</span>
-  </router-link>
+  </div>
 </template>
 <script>
 export default {
   name: 'cell-item',
   props: {
-    to: {
-      type: String,
-      default: '/'
-    },
+    to: String,
     name: String,
     size: String,
     color: String,
     text: String,
+  },
+  methods: {
+    routerGo() {
+      this.to ? this.$router.push(this.to) : this.$emit('click')
+    }
   }
 }
 </script>

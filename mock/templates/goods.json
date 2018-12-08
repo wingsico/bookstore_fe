@@ -1,0 +1,13 @@
+{
+  "status": 200,
+  "message": "ok",
+  "data|20": [
+    {
+      "book_id": "@id()",
+      "title": "@csentence(5, 20)",
+      "price": "@float(5, 60, 0, 2)",
+      "number": "@natural(1, 10)",
+      "cover_url": "@image('90x90')"
+    }
+  ]
+}

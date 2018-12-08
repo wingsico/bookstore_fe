@@ -2,9 +2,6 @@
   "status": 200,
   "message": "ok",
   "data": {
-    "size": 20,
-    "page": 1,
-    "totalPage": 40,
     "books|20": [
       {
         "id": "@id()",

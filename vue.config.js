@@ -4,7 +4,16 @@ const MockServer = require('./mock');
 module.exports = {
   assetsDir: 'assets',
   devServer: {
-    before: MockServer,
+    // before: MockServer,
+    proxy: {
+      '/api': {
+        pathRewrite: {
+          '^/api': '',
+        },
+        target: 'http://192.168.0.107:8080/api',
+        changeOrigin: true
+      },
+    }
   },
   pages: {
     index: {

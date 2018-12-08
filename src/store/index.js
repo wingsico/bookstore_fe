@@ -1,7 +1,8 @@
+import { Toast, Dialog } from 'vant';
 import Vue from 'vue';
 import Vuex from 'vuex';
-import { SAVE_USER, SAVE_ORDER_LIST,SAVE_BOOK_LIST, ADD_BOOK_LIST } from './types';
-import { Toast } from 'vant';
+import { SAVE_CART_GOODS, SAVE_ORDER_LIST, SAVE_RECOMMENDS, SAVE_USER, SET_CART_GOODS_CHECKED, SET_CART_GOODS_COUNT, SAVE_CART_ORDER, SAVE_CLASSIFICATIONS } from './types';
+import { encrypt } from '@/utils/utils';
 
 Vue.use(Vuex);
 
@@ -9,13 +10,12 @@ export default new Vuex.Store({
   state: {
     user: {},
     orderList: [],
-    // guessLikeBooks: [],
-    bookList: {
-      pageSize: 10,
-      page: 1,
-      totalPage: 10,
-      books: [],
-    }
+    recommends: [],
+    cartGoods: [],
+    cartOrder: {
+      commodities: [],
+    },
+    classifications: []
   },
   getters: {
     user(state) {
@@ -24,39 +24,134 @@ export default new Vuex.Store({
     orderList(state) {
       return state.orderList;
     },
-    bookList(state) {
-      return state.bookList;
+    recommends(state) {
+      return state.recommends;
+    },
+    cartGoods(state) {
+      return state.cartGoods;
+    },
+    cartOrder(state) {
+      return state.cartOrder;
+    },
+    classifications(state) {
+      return state.classifications;
     }
   },
   mutations: {
-    [SAVE_USER](state, {payload}) {
+    [SAVE_USER](state, { payload }) {
       state.user = payload;
     },
     [SAVE_ORDER_LIST](state, { payload }) {
       state.orderList = payload;
     },
-    [SAVE_BOOK_LIST](state, { payload }) {
-      state.bookList = payload;
+    [SAVE_RECOMMENDS](state, { payload }) {
+      state.recommends = payload;
     },
-    [ADD_BOOK_LIST](state, { payload }) {
-      state.bookList.page = payload.page;
-      state.bookList.pageSize = payload.pageSize;
-      state.bookList.books.push(payload.books);
+    [SAVE_CART_GOODS](state, { payload }) {
+      state.cartGoods = payload;
+    },
+    setOrderList(state, { payload }) {
+      state.orderList = payload;
+    },
+    [SET_CART_GOODS_CHECKED](state, { payload }) {
+      state.cartGoods.splice([payload.index], 1, {
+        ...state.cartGoods[payload.index],
+        checked: payload.checked
+      })
+    },
+    [SET_CART_GOODS_COUNT](state, { payload }) {
+      state.cartGoods.splice([payload.index], 1, {
+        ...state.cartGoods[payload.index],
+        number: payload.number
+      })
+    },
+    [SAVE_CART_ORDER](state, { payload }) {
+      state.cartOrder = payload;
+    },
+    [SAVE_CLASSIFICATIONS](state, { payload }) {
+      state.classifications = payload;
     }
   },
   actions: {
+    async addGood({ dispatch, commit, state }, good = {}) {
+      if (state.cartGoods.find(g => g.bookID === good.bookID)) {
+        Dialog.alert({ message: '该商品已经在购物车里了' })
+        return;
+      }
+      const { cart } = await dispatch('getApi');
+      const res = await cart.addGood(good)
+      const { data: { data } } = res;
+      commit({
+        type: SAVE_CART_GOODS,
+        payload: [...state.cartGoods, data.commodity],
+      })
+
+      Dialog.alert({ message: '添加购物车成功' })
+
+    },
+    setGoodChecked({ commit }, data = {}) {
+      commit({
+        type: SET_CART_GOODS_CHECKED,
+        payload: data,
+      })
+    },
+    async setGoodCount({ commit, state, dispatch }, goodCount = {}) {
+      const { cart } = await dispatch('getApi');
+      const body = {
+        number: goodCount.number,
+        bookID: state.cartGoods[goodCount.index].bookID
+      }
+      const res = await cart.updateGoodCount(body);
+      const { data } = res;
+      if (data.status === 200) {
+        commit({
+          type: SET_CART_GOODS_COUNT,
+          payload: {
+            number: data.data.commodity.number,
+            index: goodCount.index
+          },
+        })
+      } else {
+        Toast(data.message)
+      }
+
+    },
+    async getCartGoods({ dispatch, commit }) {
+      const { cart } = await dispatch('getApi');
+      const res = await cart.getCartGoods();
+      const { data: { data } } = res;
+      commit({
+        type: SAVE_CART_GOODS,
+        payload: data.commodities,
+      });
+    },
+    async submitCartOrder({ commit,dispatch }, bookIDs = []) {
+      const { order } = await dispatch('getApi');
+      const res = await order.addOrder(bookIDs)
+      const { data: { data } } = res;
+      commit({
+        type: SAVE_CART_ORDER,
+        payload: data.order,
+      })
+    },
     async login({ dispatch, commit }, userInfo) {
       const { user } = await dispatch('getApi');
       const res = await user.login(userInfo);
-      const { data: { data } } = res;
+      const { data: { data: { user: _user } } } = res;
+      window.$cookies.set("username", encrypt(userInfo.username), '2h')
+        .set("password", encrypt(userInfo.password), '2h')
+        .set("userID", _user.id, '2h');
       commit({
         type: SAVE_USER,
-        payload: data,
+        payload: _user,
       });
+      dispatch('getCartGoods')
     },
     async logout({ commit }, router) {
       commit({ type: SAVE_USER, payload: {} })
       commit({ type: SAVE_ORDER_LIST, payload: [] })
+      window.$cookies.remove('username')
+      window.$cookies.remove('password')
       Toast('注销成功');
       router.push('/login')
     },
@@ -72,37 +167,57 @@ export default new Vuex.Store({
       const { data: { message } } = res;
       Toast(message);
     },
-    async updateNickname({ commit, dispatch }, password) {
+    async updateNickname({ commit, dispatch }, nickname) {
       const { user } = await dispatch('getApi');
-      const res = await user.updateNickPwd(password);
-      const { data: { message } } = res;
+      const res = await user.updateNickname(nickname);
+      const { data: { message, data } } = res;
+      commit({
+        type: SAVE_USER,
+        payload: data.user,
+      })
       Toast(message);
     },
     async getOrderList({ dispatch, commit }, user_id) {
       const { order } = await dispatch('getApi');
       const res = await order.list(user_id);
       const { data: { data } } = res;
-      Toast('获取成功');
       commit({
         type: SAVE_ORDER_LIST,
-        payload: data,
+        payload: data.orders,
       })
     },
-    async getBookList({ dispatch, commit }, config = {}) {
-      const { user } = await dispatch('getApi');
-      const res = await user.getBookList(config);
+    async getRecommends({ dispatch, commit }) {
+      const { book } = await dispatch('getApi');
+      const res = await book.getRecommends();
       const { data: { data } } = res;
-      if (config.add) {
-        commit({
-          type: ADD_BOOK_LIST,
-          payload: data,
-        })
-      } else {
-        commit({
-          type: SAVE_BOOK_LIST,
-          payload: data,
-        })
-      }
+      commit({
+        type: SAVE_RECOMMENDS,
+        payload: data.books,
+      })
+    },
+    clearRecommends({ commit }) {
+      commit({
+        type: SAVE_RECOMMENDS,
+        payload: [],
+      })
+    },
+    async getClassifications({ dispatch, commit }) {
+      const { book } = await dispatch('getApi');
+      const res = await book.getClassifications();
+      const { data: { data } } = res;
+      commit({
+        type: SAVE_CLASSIFICATIONS,
+        payload: data.classifications.sort((a, b) => b.id - a.id),
+      })
+    },
+    async getOrder({ dispatch, commit }, order_id = "") {
+      const { order } = await dispatch('getApi');
+      const res = await order.getOrder(order_id);
+      const { data: { data } } = res;
+      commit({
+        type: SAVE_CART_ORDER,
+        payload: data.order,
+      })
     },
     getApi() {
       return this._vm.$api;

@@ -7,7 +7,9 @@
             <span class="text">{{item.text}}</span>
           </van-tabbar-item>
         </van-tabbar>
-        <router-view></router-view>
+        <keep-alive>
+          <router-view></router-view>
+        </keep-alive>
       </div>
     </CommonNavbarLayout>
   </div>
@@ -26,19 +28,18 @@ export default {
         map: [
           {
             to: '/user/order/all_list',
-            text: '全部订单'
+            text: '全部订单',
+            index: 0,
           },
           {
             to: '/user/order/pay_list',
-            text: '待付款'
-          },
-          {
-            to: '/user/order/get_list',
-            text: '待收货'
+            text: '待付款',
+            index: 1,
           },
           {
             to: '/user/order/finish_list',
-            text: '已完成'
+            text: '已完成',
+            index: 2,
           }
         ]
       }
@@ -51,11 +52,15 @@ export default {
     ...mapActions([ 'getOrderList']),
     handleBackClick() {
       this.$router.go(-1);
+    },
+    setActiveList() {
+      const { fullPath } = this.$route;
+      this.tabbar.active = this.tabbar.map.filter(item => item.to === fullPath)[0].index;
     }
   },
   created() {
-    console.log(this.user.user_id)
     this.getOrderList(this.user.user_id);
+    this.setActiveList();
   }
 };
 </script>

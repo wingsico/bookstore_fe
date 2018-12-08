@@ -71,29 +71,32 @@ export default function request(url, options) {
 
       if (!response) {
         Toast.fail(codeMessage[504]);
+        return;
       }
 
       const { status, data } = response;
       const errorMessage = data.message || data.error || codeMessage[status];
       e.message = errorMessage;
 
-      if (status === 401) {
-
-      }
-      if (status === 404) {
-
-      }
-      if (status > 401 || status === 400) {
-
-      }
-
-      Toast.fail({
-        message: errorMessage,
-        duration: 3000,
-      });
-
-      throw e;
+      return e;
     });
 }
 
-axios.defaults.timeout = 10000;
+axios.interceptors.request.use(
+  config => {
+    const { headers, addToken = true } = config;
+    if (addToken) {
+      return {
+        ...config,
+        headers: {
+          ...headers,
+          authorization: window.$cookies.get('userID'),
+        },
+      };
+    }
+    return config;
+  },
+  err => Promise.reject(err)
+);
+
+axios.defaults.timeout = 20000;

@@ -1,5 +1,12 @@
 import request from '@/utils/request';
 
+function register(data = {}) {
+  return request('/api/user/register', {
+    method: 'POST',
+    data,
+  })
+}
+
 function login(params) {
   return request('/api/user/login', {
     method: 'POST',
@@ -7,26 +14,18 @@ function login(params) {
   });
 }
 
-function updateUserPwd(userPwd) {
-  return request('/api/user/change', {
-    method: 'POST',
-    data: {
-      userPwd,
-    }
-  })
-}
 
 function updatePayPwd(payPwd) {
-  return request('/api/user/change', {
+  return request('/api/user/updatePayment', {
     method: 'POST',
     data: {
-      payPwd,
+      payment: payPwd,
     },
   })
 }
 
 function updateNickname(nickname) {
-  return request('/api/user/change', {
+  return request('/api/user/update', {
     method: 'POST',
     data: {
       nickname,
@@ -34,20 +33,15 @@ function updateNickname(nickname) {
   })
 }
 
-function getBookList({ pageSize = 20, page = 1 }) {
-  return request('/api/book/list', {
-    method: 'GET',
-    params: {
-      pageSize,
-      page,
-    }
-  })
+function getDeposit() {
+  return request('/api/user/deposit');
 }
+
 
 export default {
   login,
   updateNickname,
   updatePayPwd,
-  updateUserPwd,
-  getBookList
+  getDeposit,
+  register
 }

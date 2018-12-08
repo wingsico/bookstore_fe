@@ -1,70 +1,83 @@
 <template>
   <div class="basic-layout">
-    <router-view :class="{'tab-container': displayTabbar}"></router-view>
-    <van-tabbar v-model="active" class="tabbar" v-if="displayTabbar">
+    <keep-alive include="home-page">
+      <router-view :class="{'tab-container': displayTabbar}"></router-view>
+    </keep-alive>
+    <van-tabbar v-model="active" class="tabbar" v-if="displayTabbar" @change="backToTop">
       <van-tabbar-item icon="home" to="/" replace>首页</van-tabbar-item>
-      <van-tabbar-item icon="cart" to="/cart">购物车</van-tabbar-item>
+      <van-tabbar-item icon="cart" to="/cart" :info="goodsCount">购物车</van-tabbar-item>
       <van-tabbar-item icon="contact" to="/user">{{ userTabBarName }}</van-tabbar-item>
     </van-tabbar>
   </div>
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex';
-import isEmpty from 'lodash/isEmpty';
+import { mapGetters, mapActions } from "vuex";
+import isEmpty from "lodash/isEmpty";
 
 const map = {
-  '': 0,
-  '/': 0,
-  '/cart': 1,
-  '/user': 2,
-}
+  "": 0,
+  "/": 0,
+  "/cart": 1,
+  "/user": 2
+};
 
 export default {
-  name: 'basic-layout',
+  name: "basic-layout",
   data() {
     return {
-      active: 0,
-    }
+      active: 0
+    };
   },
   methods: {
-    ...mapActions(['login']),
-    checkActiveRouter({fullPath}) {
-      this.active = map[fullPath];
+    ...mapActions(["login"]),
+    checkActiveRouter() {
+      this.active = map[this.$route.fullPath];
     },
+    hiddenFilter(tabbar = []) {
+      const hiddens = ['/cart'];
+      return tabbar.filter(bar => !hiddens.includes(bar));
+    },
+    backToTop() {
+      window.scrollTo(0, 0);
+    }
   },
   computed: {
-    ...mapGetters(['user']),
+    ...mapGetters(["user", "cartGoods"]),
     userTabBarName() {
-      return !isEmpty(this.user) ? '我的': '未登录'
+      return !isEmpty(this.user) ? "我的" : "未登录";
     },
     displayTabbar() {
-      return Object.keys(map).includes(this.$route.fullPath);
+      const tabbar = Object.keys(map);
+      const filterTabbar = this.hiddenFilter(tabbar);
+      return filterTabbar.includes(this.$route.fullPath) || this.$route.fullPath === '/cart' && this.cartGoods.length === 0;
     },
-
+    goodsCount() {
+      return this.cartGoods.length;
+    }
   },
-  beforeRouteUpdate (to, from, next) {
-    next();
-    this.checkActiveRouter(to);
+  watch: {
+    '$route'() {
+      this.checkActiveRouter();
+    }
   },
   created() {
-    this.checkActiveRouter(this.$route)
+    this.checkActiveRouter();
   }
 };
 </script>
 
 <style lang="scss" scoped>
-  .basic-layout {
-    .tab-container {
-      padding-bottom: 60px;
-      background-color: #f7f7f7;
-    }
-    .tabbar {
-      box-shadow: 0 0 10px 0 hsla(0,6%,58%,.6);
-      .van-tabbar-item--active {
-        color: #cd2525;
-      }
-      height: 50px;
-    }
+.basic-layout {
+  .tab-container {
+    padding-bottom: 50px;
   }
+  .tabbar {
+    box-shadow: 0 0 10px 0 hsla(0, 6%, 58%, 0.6);
+    .van-tabbar-item--active {
+      color: #cd2525;
+    }
+    height: 50px;
+  }
+}
 </style>

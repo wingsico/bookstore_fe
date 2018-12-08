@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import BasicLayout from './layouts/BasicLayout.vue';
 import LoginPage from './views/login/index.vue';
+import RegisterPage from './views/login/register.vue';
 import OrderPage from './views/user/order/index.vue';
 
 const HomePage = () => import('./views/home/index.vue');
@@ -10,9 +11,9 @@ const CartPage = () => import('./views/cart/index.vue');
 const OrderList = () => import('./views/user/order/orderList.vue');
 const UserSettingsPage = () => import('./views/user/setting.vue');
 const ChangePayPwdPage = () => import('./views/user/changes/PayPwd.vue');
-const ChangeUserPwdPage = () => import('./views/user/changes/UserPwd.vue');
 const ChangeNicknamePage = () => import('./views/user/changes/Nickname.vue');
-
+const BookDetailPage = () => import('./views/book/index.vue');
+const CartOrderPage = () => import('./views/cart/order.vue');
 
 Vue.use(Router);
 
@@ -40,10 +41,6 @@ export default new Router({
             {
               path: '/user/pay_pwd_change',
               component: ChangePayPwdPage,
-            },
-            {
-              path: '/user/user_pwd_change',
-              component: ChangeUserPwdPage,
             },
             {
               path: '/user/nickname_change',
@@ -76,18 +73,10 @@ export default new Router({
                   component: OrderList,
                 },
                 {
-                  path: 'get_list',
-                  name: 'get_list',
-                  meta: {
-                    status: 2,
-                  },
-                  component: OrderList,
-                },
-                {
                   path: 'finish_list',
                   name: 'finish_list',
                   meta: {
-                    status: 3,
+                    status: 2,
                   },
                   component: OrderList,
                 }
@@ -99,6 +88,13 @@ export default new Router({
           path: 'cart',
           name: 'cart',
           component: CartPage,
+        },
+        {
+          path: 'cart/order',
+          meta: {
+            auth: true
+          },
+          component: CartOrderPage,
         }
       ]
     },
@@ -107,5 +103,15 @@ export default new Router({
       name: 'login',
       component: LoginPage,
     },
+    {
+      path: '/register',
+      name: 'register',
+      component: RegisterPage,
+    },
+    {
+      path: '/book/detail/:id',
+      name: 'book-detail',
+      component: BookDetailPage
+    }
   ],
 })

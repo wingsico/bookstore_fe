@@ -41,6 +41,7 @@
           plain
           size="large"
           class="button"
+          @click="$router.push('/register')"
         >
           一键注册
         </van-button>
@@ -52,7 +53,6 @@
 
 <script>
 import { mapActions, mapGetters} from 'vuex';
-import { encrypt } from '@/utils/utils';
 
 export default {
   name: 'login-form',
@@ -82,8 +82,6 @@ export default {
       const {username, password, $router} = this;
       await this.login({username,password})
       this.$toast('登录成功');
-      this.$cookies.set("username", encrypt(username), '2h')
-        .set("password", encrypt(password), '2h')
       $router.push('/user')
     },
     setLoginingStatus(status = false) {

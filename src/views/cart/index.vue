@@ -2,36 +2,92 @@
   <div class="cart-page">
     <CommonNavbarLayout title="购物车">
       <div class="no-login" v-if="!isLogin">
-      <div class="shopcart-empty-wrap">
-        <img :src="require(`@/assets/empty-cart.png`)" class="empty-icon">
-        <p class="empty-text">登录后可同步购物车中商品</p>
-        <router-link tag="div" class="login-btn" to="/login">登录</router-link>
+        <div class="shopcart-empty-wrap">
+          <img :src="require(`@/assets/empty-cart.png`)" class="empty-icon">
+          <p class="empty-text">登录后可同步购物车中商品</p>
+          <router-link tag="div" class="login-btn" to="/login">登录</router-link>
+        </div>
+        <CommonRecommendList/>
       </div>
-      <CommonDivider type="horizontal"/>
-      <div class="guess-like">
-        <h3 class="title">猜 你 喜 欢</h3>
-        <div class="container"></div>
+      <div class="logined" v-else>
+        <div v-if="cartGoods.length > 0">
+          <keep-alive>
+            <van-list class="cart-list">
+              <CartGood
+                v-for="(good, index) in cartGoods"
+                :checked="good.checked"
+                :key="good.bookID"
+                :title="good.title"
+                :cover_url="good.cover_url"
+                :price="good.price"
+                :number="good.number"
+                :index="index"
+                @checkedChange="checkedChange"
+                @countChange="countChange"
+                class="cart-good-item"
+              />
+            </van-list>
+          </keep-alive>
+          <van-submit-bar :price="totalPrice" button-text="提交订单" class="submit-bar van-hairline--top" @submit="submitOrder" />
+        </div>
+        <div v-else>
+          <div class="shopcart-empty-wrap">
+          <img :src="require(`@/assets/empty-cart.png`)" class="empty-icon">
+          <p class="empty-text">购物车里空空如也~快去逛逛吧~</p>
+        </div>
+        <CommonRecommendList/>
+        </div>
+
       </div>
-    </div>
-    <div class="logined" v-else>
-      <van-submit-bar :price="3050" button-text="提交订单" @submit="onSubmit" class="submit-bar van-hairline--top">
-        <van-checkbox v-model="checked" class="check-all">全选</van-checkbox>
-      </van-submit-bar>
-    </div>
+
     </CommonNavbarLayout>
   </div>
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 import isEmpty from "lodash/isEmpty";
 
 export default {
   name: "cart-page",
+  data() {
+    return {
+
+    };
+  },
   computed: {
-    ...mapGetters(["user"]),
+    ...mapGetters(["user", "cartGoods", "cartOrder"]),
     isLogin() {
       return !isEmpty(this.user);
+    },
+    checkedGoods() {
+      return this.cartGoods.filter(good => good.checked);
+    },
+    totalPrice() {
+      return this.checkedGoods.reduce((acc, cur) => acc + cur.number * cur.price, 0)*100;
+    }
+  },
+  methods: {
+    ...mapActions(["getCartGoods", "setGoodChecked", "setGoodCount", "submitCartOrder"]),
+    checkedChange(checked, index) {
+      this.setGoodChecked({ checked, index });
+    },
+    countChange(number, index) {
+      this.setGoodCount({ number, index });
+    },
+    async submitOrder(){
+      await this.submitCartOrder(this.checkedGoods.map(good => good.bookID));
+      this.$router.push('/cart/order?order_id=' + this.cartOrder.orderID);
+    }
+  },
+  beforeRouteEnter (to, from, next) {
+    next();
+    window.scrollTo(0, 0);
+    window.scroll();
+  },
+  created() {
+    if (this.cartGoods.length === 0 && !isEmpty(this.user)) {
+      this.getCartGoods(this.user.user_id);
     }
   }
 };
@@ -41,41 +97,6 @@ export default {
 .cart-page {
   .no-login {
     padding: 0 20px;
-    .guess-like {
-      position: relative;
-      background: #fff;
-      .title {
-        margin: 0;
-        position: absolute;
-        top: -36px;
-        left: 50%;
-        transform: translateX(-50%);
-        font-weight: 400;
-        font-size: 12px;
-        color: #ccc;
-        background: #fff;
-        padding: 5px 15px;
-        text-align: center;
-        &::after,
-        &::before {
-          content: "";
-          position: absolute;
-          top: 50%;
-          margin-top: -1.5px;
-          width: 4px;
-          height: 4px;
-          background-color: #ccc;
-          -webkit-transform: rotate(45deg);
-          transform: rotate(45deg);
-        };
-        &::after {
-          right: 0;
-        }
-        &::before {
-          left: 0;
-        }
-      }
-    }
   }
 
   .shopcart-empty-wrap {
@@ -106,13 +127,25 @@ export default {
     }
   }
 
+  .logined {
+    padding: 10px 20px 0px 10px;
+    position: relative;
+    background-color: #fff;
+    z-index:1;
+    .cart-list {
+      margin-top: 10px;
+      .cart-good-item {
+        margin-bottom: 20px;
+      }
+    }
+  }
+
   .submit-bar {
-    bottom: 50px;
-    background-color: hsla(0,0%,100%,.95);
+    background-color: hsla(0, 0%, 100%, 0.95);
+    z-index: 1111;
     .check-all {
       margin-left: 40px;
     }
   }
-  margin-bottom: 50px;
 }
 </style>

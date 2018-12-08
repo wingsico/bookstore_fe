@@ -2,11 +2,10 @@
   <div class="order-list">
     <OrderItem
       v-for="order in orderListByStatus"
-      :key="order.order_id"
-      :price="order.spend"
-      :goods="order.goods"
+      :key="order.orderID"
+      :goods="order.commodities"
       :status="order.status"
-      :id="order.order_id"
+      :id="order.orderID"
     />
   </div>
 </template>

@@ -23,10 +23,10 @@
         <div class="container">
           <van-card
             v-for="good in goods"
-            :key="good.good_id"
-            :num="good.count"
+            :key="good.bookID"
+            :num="good.number"
             :title="good.title"
-            :thumb="good.cover"
+            :thumb="good.cover_url"
             :desc="good.info"
             :price="good.price"
             tag="类别"
@@ -40,19 +40,21 @@
 export default {
   name: "order-item",
   props: {
-    id: String,
+    id: Number,
     status: Number,
-    price: [String, Number],
     goods: Array
   },
   computed: {
     statusText() {
-      const map = ["待付款", "待收货", "已完成"];
+      const map = ["待付款", "已完成"];
       return map[this.status - 1];
     },
     statusClass() {
-      const map = ["status-pay", "status-get", "status-finish"];
+      const map = ["status-pay", "status-finish"];
       return map[this.status - 1];
+    },
+    price() {
+      return Number(Number(this.goods.reduce((acc, cur) => acc + cur.price * cur.number,0)).toFixed(2));
     }
   }
 };

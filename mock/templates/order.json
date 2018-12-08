@@ -8,9 +8,9 @@
     "goods|1-5": [
       {
        "good_id": "@id()",
-       "cover": "@image('90x90')",
+       "cover_url": "@image('90x90')",
        "title": "@csentence(5, 20)",
-       "count": "@natural(1, 10)",
+       "number": "@natural(1, 10)",
        "info": "@csentence(20, 30)",
        "price": "@float(5, 60, 0, 2)"
       }
