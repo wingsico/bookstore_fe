@@ -33,6 +33,10 @@
         </h2>
       </div>
 
+      <div class="delete-button">
+        <van-button :loading="deleteLoading" type="danger" size="small" @click="confirmDeleteOrder">删除订单</van-button>
+      </div>
+
       <van-submit-bar
         :price="totalPrice"
         button-text="确认支付"
@@ -74,7 +78,8 @@ export default {
     return {
       showDialog: false,
       value: "",
-      payLoading: false
+      payLoading: false,
+      deleteLoading: false,
     };
   },
   computed: {
@@ -95,17 +100,19 @@ export default {
     async orderSubmit() {
       this.payLoading = true;
       Promise.all([
-        await this.$api.order.payOrder({
+        this.$api.order.payOrder({
           orderID: this.cartOrder.orderID,
           payment: this.value
         }),
-        await this.getCartGoods(),
-        await this.updateDeposit(),
+        this.getCartGoods(),
+        this.updateDeposit(),
       ]).then(() => {
-        this.payLoading = false;
         this.$dialog.alert({ message: "支付成功 " });
         this.$router.replace("/user/order/finish_list");
-      });
+      }).catch(e => {
+        this.showDialog = false;
+      })
+      this.payLoading = false;
     },
     onInput(key) {
       this.value = (this.value + key).slice(0, 6);
@@ -124,6 +131,24 @@ export default {
       } catch (e) {
         this.$toast(e.message);
         this.$router.replace("/");
+      }
+    },
+    confirmDeleteOrder() {
+      this.$dialog.confirm({
+        title: "删除订单",
+        message: "确认删除订单吗？"
+      }).then(this.handleOrderDelete).catch((e) => {console.log('取消删除')});
+    },
+    async handleOrderDelete() {
+      this.deleteLoading = true;
+      try {
+        await this.$api.order.deleteOrder(this.cartOrder.orderID)
+        this.$toast("删除成功!");
+        this.$router.go(-1);
+      } catch(e) {
+        throw e;
+      } finally {
+        this.deleteLoading = false;
       }
     }
   },
@@ -147,6 +172,9 @@ export default {
   padding: 15px;
   background-color: #f8f8f8;
   min-height: calc(100vh - 50px);
+  .delete-button {
+    text-align: right;
+  }
   .cell-card {
     h2 {
       font-weight: 400;
