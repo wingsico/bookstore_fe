@@ -37,7 +37,6 @@
       <van-cell class="checked-book" clickable @click="displaySku" value="···">
         <div slot="title" class="checked-box">
           <span class="lable">已选</span>
-          <!-- <span class="book-title van-ellipsis">{{ book.title }}</span> -->
           <span class="number">{{ number }} 本</span>
         </div>
       </van-cell>
@@ -63,13 +62,25 @@
         v-model="showBase"
         :sku="sku"
         :goods="goods"
-        :goods-id="book.book_id"
-        :close-on-click-overlay="true"
-        :hide-stock="true"
-        @stepper-change="handleGoodsCountChange"
-        :custom-stepper-config="customStepperConfig"
-        :quota="quota"
-      />
+        :goods-id="book.id"
+        :hide-stock="sku.hide_stock"
+        @add-cart="addCartGood"
+        @buy-clicked="handleBuyNow"
+      >
+        <div slot="sku-stepper" class="sku-stepper">
+          <div class="sku-info">
+            <div class="buy-text">购买数量</div>
+            <van-stepper
+              v-model="number"
+              integer
+              :min="1"
+              :max="quota"
+              @overlimit="handleStepperOverLimit"
+            />
+          </div>
+          <div class="quota-info">单次限购{{quota}}本书籍</div>
+        </div>
+      </van-sku>
 
       <CommonRecommendList :border="true"/>
     </CommonNavbarLayout>
@@ -80,7 +91,7 @@
 import moment from "moment";
 import { mapGetters, mapActions } from "vuex";
 
-const quotaLimit = 99;
+const quotaLimit = 10;
 export default {
   name: "book-detail",
   data() {
@@ -100,10 +111,7 @@ export default {
       number: 1,
       showBase: false,
       loading: false,
-      quota: quotaLimit,
-      customStepperConfig: {
-        quotaText: `每次限购${quotaLimit}件`
-      }
+      quota: quotaLimit
     };
   },
   beforeRouteLeave(to, from, next) {
@@ -111,7 +119,7 @@ export default {
     next();
   },
   methods: {
-    ...mapActions(["addGood"]),
+    ...mapActions(["addGood", "submitCartOrder"]),
     displaySku() {
       this.showBase = true;
     },
@@ -125,22 +133,16 @@ export default {
           data: { data }
         } = res;
         this.book = data.book;
-        this.loading = false;
       } catch (e) {
         this.$toast(e.message);
-        this.loading = false;
         this.$router.go(-1);
+      } finally {
+        this.loading = false;
       }
-    },
-    handleGoodsCountChange(number) {
-      if (number > this.quota) {
-        this.$toast(`单次最多购买${this.quota}件`);
-        number = this.quota;
-        return;
-      }
-      this.number = number;
     },
     async addCartGood() {
+      this.showBase = false;
+
       const bookID = this.book.id;
       const number = this.number;
 
@@ -153,6 +155,18 @@ export default {
     },
     clearBookNumber() {
       this.number = 1;
+    },
+    handleStepperOverLimit(action) {
+      if(action === "minus") {
+        this.$toast("至少选择一本书籍")
+      } else {
+        this.$toast(`最多单次购买${this.quota}本书籍`)
+      }
+    },
+    async handleBuyNow(skuData) {
+      const bookID = this.book.id;
+      await this.submitCartOrder([bookID]);
+      this.$router.push("/cart/order?order_id=" + this.cartOrder.orderID);
     }
   },
   watch: {
@@ -164,13 +178,14 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["cartGoods"]),
+    ...mapGetters(["cartGoods", "cartOrder"]),
     sku() {
       return {
         price: this.book.price,
+        collection_id: this.book.id,
         none_sku: true,
-        tree: [], // 防止报错
-        list: []
+        tree: [],
+        hide_stock: true
       };
     },
     goods() {
@@ -183,10 +198,14 @@ export default {
       return this.cartGoods.length;
     },
     intPart() {
-      return Number(this.book.price).toFixed(2).split(".")[0];
+      return Number(this.book.price)
+        .toFixed(2)
+        .split(".")[0];
     },
     floatPart() {
-      const float = Number(this.book.price).toFixed(2).split(".")[1];
+      const float = Number(this.book.price)
+        .toFixed(2)
+        .split(".")[1];
       return float;
     },
     publishDate() {
@@ -202,6 +221,21 @@ export default {
 <style lang="scss" scoped>
 .book-detail {
   padding-bottom: 50px;
+  .sku-stepper {
+    padding: 20px;
+    .sku-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 16px;
+    }
+
+    .quota-info {
+      display: inline-block;
+      color: #f44;
+      font-size: 12px;
+    }
+  }
   .book-cover_url-wrapper {
     padding: 5px 0;
     width: 100%;

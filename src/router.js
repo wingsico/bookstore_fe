@@ -5,6 +5,7 @@ const BasicLayout = () => import('./layouts/BasicLayout.vue');
 const LoginPage =  () => import('./views/login/index.vue');
 const RegisterPage = () => import('./views/login/register.vue');
 const OrderPage = () => import('./views/user/order/index.vue');
+const PageNotFound = () => import('./views/404/404.vue');
 
 const HomePage = () => import('./views/home/index.vue');
 const UserPage = () => import('./views/user/index.vue');
@@ -113,6 +114,7 @@ export default new Router({
       path: '/book/detail/:id',
       name: 'book-detail',
       component: BookDetailPage
-    }
+    },
+    { path: '*', component: PageNotFound }
   ],
 })

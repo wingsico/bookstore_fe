@@ -232,6 +232,12 @@ export default new Vuex.Store({
         }
       })
     },
+    clearCartOrder({ commit }) {
+      commit({
+        type: SAVE_CART_ORDER,
+        payload: {},
+      })
+    },
     getApi() {
       return this._vm.$api;
     },

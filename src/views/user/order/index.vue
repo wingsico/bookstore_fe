@@ -69,6 +69,7 @@ export default {
 .order-page {
   .tabbar {
     position: relative;
+    top: -1px;
     height: 44px;
     .item {
       .text {

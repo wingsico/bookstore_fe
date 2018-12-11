@@ -42,7 +42,7 @@
         button-text="确认支付"
         class="submit-bar van-hairline--top"
         @submit="showDialog = true"
-        v-if="!(cartOrder.status === 2)"
+        v-if="showSubmitbar"
       />
       <!-- 不使用 !== 2 防止开始时默认显示而产生闪烁 -->
       <van-popup
@@ -93,10 +93,14 @@ export default {
           ) * 100
         ).toFixed(2)
       );
-    }
+    },
+    showSubmitbar() {
+      const {status, userID} = this.cartOrder;
+      return !(status === 2) || (status === 2 && this.cartOrder.userID === this.user.userID);
+    },
   },
   methods: {
-    ...mapActions(["getOrder", "getCartGoods", "updateDeposit"]),
+    ...mapActions(["getOrder", "getCartGoods", "updateDeposit", "clearCartOrder"]),
     async orderSubmit() {
       this.payLoading = true;
       Promise.all([
@@ -130,7 +134,7 @@ export default {
         await this.getOrder(this.$route.query.order_id);
       } catch (e) {
         this.$toast(e.message);
-        this.$router.replace("/");
+        this.$router.replace("/404");
       }
     },
     confirmDeleteOrder() {
@@ -163,7 +167,7 @@ export default {
   },
   created() {
     this.fetchOrder();
-  }
+  },
 };
 </script>
 

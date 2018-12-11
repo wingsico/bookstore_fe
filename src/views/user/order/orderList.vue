@@ -29,7 +29,7 @@ export default {
       if (status === 0) {
         return this.orderList;
       } else {
-        return this.orderList.filter(order => order.status === status);
+        return this.orderList.filter(order => order.status === status).sort((a,b) => new Date(a.date) > new Date(b.date));
       }
     }
   },

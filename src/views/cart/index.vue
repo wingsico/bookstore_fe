@@ -30,18 +30,21 @@
               />
             </van-list>
           </keep-alive>
-          <van-submit-bar :price="totalPrice" button-text="提交订单" class="submit-bar van-hairline--top" @submit="submitOrder" />
+          <van-submit-bar
+            :price="totalPrice"
+            button-text="提交订单"
+            class="submit-bar van-hairline--top"
+            @submit="submitOrder"
+          />
         </div>
         <div v-else>
           <div class="shopcart-empty-wrap">
-          <img :src="require(`@/assets/empty-cart.png`)" class="empty-icon">
-          <p class="empty-text">购物车里空空如也~快去逛逛吧~</p>
+            <img :src="require(`@/assets/empty-cart.png`)" class="empty-icon">
+            <p class="empty-text">购物车里空空如也~快去逛逛吧~</p>
+          </div>
+          <CommonRecommendList/>
         </div>
-        <CommonRecommendList/>
-        </div>
-
       </div>
-
     </CommonNavbarLayout>
   </div>
 </template>
@@ -53,9 +56,7 @@ import isEmpty from "lodash/isEmpty";
 export default {
   name: "cart-page",
   data() {
-    return {
-
-    };
+    return {};
   },
   computed: {
     ...mapGetters(["user", "cartGoods", "cartOrder"]),
@@ -66,34 +67,40 @@ export default {
       return this.cartGoods.filter(good => good.checked);
     },
     totalPrice() {
-      return this.checkedGoods.reduce((acc, cur) => acc + cur.number * cur.price, 0)*100;
+      return (
+        this.checkedGoods.reduce(
+          (acc, cur) => acc + cur.number * cur.price,
+          0
+        ) * 100
+      );
     }
   },
   methods: {
-    ...mapActions(["getCartGoods", "setGoodChecked", "setGoodCount", "submitCartOrder", "deleteCartGood"]),
+    ...mapActions([
+      "getCartGoods",
+      "setGoodChecked",
+      "setGoodCount",
+      "submitCartOrder",
+      "deleteCartGood"
+    ]),
     checkedChange(checked, index) {
       this.setGoodChecked({ checked, index });
     },
     countChange(number, index) {
       this.setGoodCount({ number, index });
     },
-    async submitOrder(){
+    async submitOrder() {
       await this.submitCartOrder(this.checkedGoods.map(good => good.bookID));
-      this.$router.push('/cart/order?order_id=' + this.cartOrder.orderID);
+      this.$router.push("/cart/order?order_id=" + this.cartOrder.orderID);
     },
     async handleGoodDelete(bookID) {
       try {
         await this.deleteCartGood(bookID);
-        this.$toast('删除成功!');
-      } catch(e) {
+        this.$toast("删除成功!");
+      } catch (e) {
         this.$toast(e.message);
       }
     }
-  },
-  beforeRouteEnter (to, from, next) {
-    next();
-    window.scrollTo(0, 0);
-    window.scroll();
   },
   created() {
     if (this.cartGoods.length === 0 && !isEmpty(this.user)) {
@@ -141,7 +148,7 @@ export default {
     padding: 10px 20px 0px 10px;
     position: relative;
     background-color: #fff;
-    z-index:100;
+    z-index: 100;
     .cart-list {
       margin-top: 10px;
       .cart-good-item {
