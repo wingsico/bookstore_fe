@@ -15,6 +15,10 @@
           <span class="label">状态：</span>
           <span :class="['content', statusClass]">{{ statusText }}</span>
         </div>
+        <div class="order-user">
+          <span class="label">用户名：</span>
+          <span class="content">{{ username }}</span>
+        </div>
         <div class="order-price">
           <span class="label">总价：</span>
           <span class="content">￥{{ price }}</span>
@@ -49,6 +53,7 @@ export default {
     id: Number,
     status: Number,
     goods: Array,
+    username: String,
     isLink: {
       type: Boolean,
       default: true

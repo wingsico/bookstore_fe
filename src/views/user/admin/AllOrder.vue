@@ -18,6 +18,7 @@
                 :goods="order.orderCommodities"
                 :status="order.status"
                 :id="order.orderID"
+                :username="order.username"
                 :isLink="false"
                 :isAdmin="true"
                 @statusChange="handleStatusChange"
@@ -56,6 +57,7 @@ export default {
         .getAllOrders(status)
         .then(res => {
           this.orders = res.data.data.orders;
+          console.log(this.orders)
         })
         .catch(err => {
           console.log(err);
