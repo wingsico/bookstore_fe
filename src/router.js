@@ -4,6 +4,7 @@ import BasicLayout from './layouts/BasicLayout.vue';
 import LoginPage from './views/login/index.vue';
 import RegisterPage from './views/login/register.vue';
 import OrderPage from './views/user/order/index.vue';
+import AdminPage from './views/user/admin/index.vue';
 
 const HomePage = () => import('./views/home/index.vue');
 const UserPage = () => import('./views/user/index.vue');
@@ -14,6 +15,9 @@ const ChangePayPwdPage = () => import('./views/user/changes/PayPwd.vue');
 const ChangeNicknamePage = () => import('./views/user/changes/Nickname.vue');
 const BookDetailPage = () => import('./views/book/index.vue');
 const CartOrderPage = () => import('./views/cart/order.vue');
+const AddBookPage = () => import('./views/user/admin/AddBook.vue');
+const AllOrderPage = () => import('./views/user/admin/AllOrder.vue');
+const AllUserInfoPage = () => import('./views/user/admin/AllUserInfo.vue');
 
 Vue.use(Router);
 
@@ -38,6 +42,26 @@ export default new Router({
             auth: true
           },
           children: [
+            {
+              path: '/user/admin',
+              name: 'user-admin',
+              component: AdminPage,
+              children: [
+                {
+                  path: '/user/admin/addBook',
+                  component: AddBookPage
+                },
+                {
+                  path: '/user/admin/allOrder',
+                  component: AllOrderPage
+                },
+                {
+                  path: '/user/admin/AllUserInfo',
+                  name: 'all-user-info-page',
+                  component: AllUserInfoPage
+                }
+              ]
+            },
             {
               path: '/user/pay_pwd_change',
               component: ChangePayPwdPage,

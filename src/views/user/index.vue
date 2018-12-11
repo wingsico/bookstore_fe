@@ -20,6 +20,12 @@
                 <span>账号设置</span>
               </div>
             </router-link>
+            <router-link class="admin-entry" tag="div" to="/user/admin" v-if="isAdmin">
+                <div class="admin-wrapper">
+                    <van-icon name="contact" />
+                    <span>管理员入口</span>
+                </div>
+            </router-link>
           </div>
         </div>
         <div class="cell-group">
@@ -60,6 +66,10 @@ export default {
     },
     showRouterView() {
       return this.$route.fullPath !== '/user'
+    },
+    isAdmin() {
+        console.log(this.user)
+        return this.user.role === 'admin' ? true : false;
     }
   },
   methods: {
@@ -148,6 +158,25 @@ export default {
               margin-left: 5px;
             }
           }
+        }
+        .admin-entry {
+            position: absolute;
+            right: 15px;
+            top: 60px;
+            height: 40px;
+            line-height: 40px;
+            overflow: hidden;
+            .admin-wrapper {
+                position: relative;
+                color: #FFF;
+                font-size: 18px;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                span {
+                    margin-left: 7px;
+                }
+            }
         }
         .user-avatar {
           width: 60px;
