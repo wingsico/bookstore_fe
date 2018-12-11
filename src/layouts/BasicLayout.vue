@@ -77,10 +77,11 @@ export default {
   }
   .tabbar {
     box-shadow: 0 0 10px 0 hsla(0, 6%, 58%, 0.6);
+    height: 50px;
+    z-index: 100 !important;
     .van-tabbar-item--active {
       color: #cd2525;
     }
-    height: 50px;
   }
 }
 </style>

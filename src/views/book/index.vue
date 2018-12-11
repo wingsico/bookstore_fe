@@ -129,6 +129,7 @@ export default {
       } catch (e) {
         this.$toast(e.message);
         this.loading = false;
+        this.$router.go(-1);
       }
     },
     handleGoodsCountChange(number) {
