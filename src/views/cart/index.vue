@@ -17,6 +17,7 @@
                 v-for="(good, index) in cartGoods"
                 :checked="good.checked"
                 :key="good.bookID"
+                :id="good.bookID"
                 :title="good.title"
                 :cover_url="good.cover_url"
                 :price="good.price"
@@ -24,6 +25,7 @@
                 :index="index"
                 @checkedChange="checkedChange"
                 @countChange="countChange"
+                @delete="handleGoodDelete"
                 class="cart-good-item"
               />
             </van-list>
@@ -68,7 +70,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["getCartGoods", "setGoodChecked", "setGoodCount", "submitCartOrder"]),
+    ...mapActions(["getCartGoods", "setGoodChecked", "setGoodCount", "submitCartOrder", "deleteCartGood"]),
     checkedChange(checked, index) {
       this.setGoodChecked({ checked, index });
     },
@@ -78,6 +80,14 @@ export default {
     async submitOrder(){
       await this.submitCartOrder(this.checkedGoods.map(good => good.bookID));
       this.$router.push('/cart/order?order_id=' + this.cartOrder.orderID);
+    },
+    async handleGoodDelete(bookID) {
+      try {
+        await this.deleteCartGood(bookID);
+        this.$toast('删除成功!');
+      } catch(e) {
+        this.$toast(e.message);
+      }
     }
   },
   beforeRouteEnter (to, from, next) {
@@ -131,7 +141,7 @@ export default {
     padding: 10px 20px 0px 10px;
     position: relative;
     background-color: #fff;
-    z-index:1;
+    z-index:100;
     .cart-list {
       margin-top: 10px;
       .cart-good-item {

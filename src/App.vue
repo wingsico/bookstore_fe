@@ -1,8 +1,8 @@
 <template>
   <div id="app">
-    <keep-alive>
+    <!-- <keep-alive> -->
       <router-view />
-    </keep-alive>
+    <!-- </keep-alive> -->
   </div>
 </template>
 
@@ -26,6 +26,7 @@ export default {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+
 }
 
 html,

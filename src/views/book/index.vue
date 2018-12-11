@@ -54,9 +54,9 @@
       <CommonGap/>
 
       <van-goods-action style="z-index: 6">
-        <van-goods-action-mini-btn icon="chat" text="客服" @click="$toast('暂无客服')" />
+        <van-goods-action-mini-btn icon="chat" text="客服" @click="$toast('暂无客服')"/>
         <van-goods-action-mini-btn icon="cart" text="购物车" :info="goodsCount" to="/cart"/>
-        <van-goods-action-big-btn text="加入购物车" @click="addCartGood" />
+        <van-goods-action-big-btn text="加入购物车" @click="addCartGood"/>
       </van-goods-action>
 
       <van-sku
@@ -67,6 +67,8 @@
         :close-on-click-overlay="true"
         :hide-stock="true"
         @stepper-change="handleGoodsCountChange"
+        :custom-stepper-config="customStepperConfig"
+        :quota="quota"
       />
 
       <CommonRecommendList :border="true"/>
@@ -76,8 +78,9 @@
 
 <script>
 import moment from "moment";
-import { mapGetters, mapActions } from 'vuex';
+import { mapGetters, mapActions } from "vuex";
 
+const quotaLimit = 99;
 export default {
   name: "book-detail",
   data() {
@@ -96,11 +99,19 @@ export default {
       },
       number: 1,
       showBase: false,
-      loading: false
+      loading: false,
+      quota: quotaLimit,
+      customStepperConfig: {
+        quotaText: `每次限购${quotaLimit}件`
+      }
     };
   },
+  beforeRouteLeave(to, from, next) {
+    this.clearBookNumber();
+    next();
+  },
   methods: {
-    ...mapActions(['addGood']),
+    ...mapActions(["addGood"]),
     displaySku() {
       this.showBase = true;
     },
@@ -121,23 +132,38 @@ export default {
       }
     },
     handleGoodsCountChange(number) {
+      if (number > this.quota) {
+        this.$toast(`单次最多购买${this.quota}件`);
+        number = this.quota;
+        return;
+      }
       this.number = number;
     },
     async addCartGood() {
       const bookID = this.book.id;
       const number = this.number;
-      await this.addGood({ bookID, number})
+
+      if (!this.$cookies.get("userID")) {
+        this.$toast("登录后即可同步购物车");
+        return;
+      }
+
+      await this.addGood({ bookID, number });
+    },
+    clearBookNumber() {
+      this.number = 1;
     }
   },
   watch: {
     $route(to, from) {
-      if (to.name === 'book-detail') {
+      if (to.name === "book-detail") {
+        this.clearBookNumber();
         this.getBookDetail();
       }
     }
   },
   computed: {
-    ...mapGetters(['cartGoods']),
+    ...mapGetters(["cartGoods"]),
     sku() {
       return {
         price: this.book.price,
@@ -156,11 +182,11 @@ export default {
       return this.cartGoods.length;
     },
     intPart() {
-      return String(this.book.price).split(".")[0];
+      return Number(this.book.price).toFixed(2).split(".")[0];
     },
     floatPart() {
-      const float = String(this.book.price).split(".")[1];
-      return float ? (float.length < 2 ? `0${float}` : float) : "00";
+      const float = Number(this.book.price).toFixed(2).split(".")[1];
+      return float;
     },
     publishDate() {
       return moment(new Date(this.book.publish_date)).format("YYYY-MM");

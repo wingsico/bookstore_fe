@@ -39,16 +39,23 @@ export default {
     ...mapGetters(["recommends"])
   },
   methods: {
-    ...mapActions(["getRecommends", "clearRecommends"])
+    ...mapActions(["getRecommends", "clearRecommends"]),
+    async fetchRecommends() {
+      this.loading = true;
+      try {
+        await this.getRecommends();
+      } catch(e) {
+        throw e;
+      } finally {
+        this.loading = false;
+      }
+    }
   },
-  async created() {
-    this.loading = true;
-    await this.getRecommends();
-    this.loading = false;
+  created() {
+    if (this.recommends.length === 0) {
+      this.fetchRecommends();
+    }
   },
-  beforeDestroy() {
-    this.clearRecommends();
-  }
 };
 </script>
 

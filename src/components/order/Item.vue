@@ -1,5 +1,5 @@
 <template>
-  <div class="order-item">
+  <router-link class="order-item" tag="div" :to="redirectUrl">
     <div class="order-box">
       <div class="order-id van-hairline--bottom">
         <span class="label">订单号：</span>
@@ -29,14 +29,15 @@
             :thumb="good.cover_url"
             :desc="good.info"
             :price="good.price"
-            tag="类别"
+            :tag="classifications[good.classification - 1].name"
           />
         </div>
       </div>
     </div>
-  </div>
+  </router-link>
 </template>
 <script>
+import {mapGetters} from 'vuex';
 export default {
   name: "order-item",
   props: {
@@ -45,6 +46,7 @@ export default {
     goods: Array
   },
   computed: {
+    ...mapGetters(['classifications']),
     statusText() {
       const map = ["待付款", "已完成"];
       return map[this.status - 1];
@@ -55,6 +57,9 @@ export default {
     },
     price() {
       return Number(Number(this.goods.reduce((acc, cur) => acc + cur.price * cur.number,0)).toFixed(2));
+    },
+    redirectUrl() {
+      return `/cart/order?order_id=${this.id}`
     }
   }
 };

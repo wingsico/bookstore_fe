@@ -9,15 +9,20 @@
       <CommonDivider type="horizontal" class="line"/>
       <h2 class="title">木迹推荐</h2>
     </div>
-    <van-tabs v-model="active" sticky swipeable @click="onTabChange">
-      <van-tab
-        v-for="classification in classifications"
-        :key="classification.id"
-        :title="classification.name"
-      >
-        <HomeBookTypeList :classification="classification.id" class="book-list" />
-      </van-tab>
-    </van-tabs>
+    <div v-if="loading">
+      <van-loading class="loading" />
+    </div>
+    <keep-alive v-else>
+      <van-tabs v-model="active" sticky swipeable @click="onTabChange">
+        <van-tab
+          v-for="classification in classifications"
+          :key="classification.id"
+          :title="classification.name"
+        >
+          <HomeBookTypeList :classification="classification.id" class="book-list"/>
+        </van-tab>
+      </van-tabs>
+    </keep-alive>
   </div>
 </template>
 <script>
@@ -33,17 +38,18 @@ export default {
         "http://img60.ddimg.cn/upload_img/00316/by/750x315_wzh_20181121-1542792577.jpg",
         "http://img61.ddimg.cn/upload_img/00570/tongshu/750x315_djj_1101-1541138681.jpg"
       ],
-      active: 0,
+      active: 0
     };
   },
   methods: {
-    onTabChange(index, title) {
-
-    },
+    onTabChange(index, title) {},
   },
   computed: {
-    ...mapGetters(['classifications'])
-  },
+    ...mapGetters(["classifications"]),
+    loading () {
+      return this.classifications.length === 0;
+    }
+  }
 };
 </script>
 <style lang="scss" scoped>
@@ -52,6 +58,9 @@ export default {
   min-height: calc(100vh - 50px);
   .book-list {
     margin-bottom: 20px;
+  }
+  .loading {
+    margin: 10px auto;
   }
   .swipe-wrapper {
     .swipe-item {

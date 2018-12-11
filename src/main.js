@@ -3,15 +3,20 @@ import App from './App.vue';
 import router from './router';
 import store from './store';
 import Vant, { Lazyload, Toast } from 'vant';
+import VueTouch from 'vue-touch';
 import VueCookies from 'vue-cookies'
 import services from '@/services/index.js';
 import { encrypt, decrypt } from '@/utils/utils.js';
 import isEmpty from 'lodash/isEmpty';
 import './components/index.js';
+import './event';
 import 'amfe-flexible';
 import 'normalize.css';
 import 'vant/lib/index.css';
 
+// VueTouch.config.press = {
+//   threshold: 1000
+// }
 
 Vue.use(services);
 Vue.use(Vant);
@@ -20,6 +25,7 @@ Vue.use(Lazyload, {
   lazyComponent: true,
   error: require('@/assets/error.png'),
 });
+Vue.use(VueTouch);
 
 Vue.config.productionTip = false;
 

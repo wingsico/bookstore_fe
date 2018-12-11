@@ -68,6 +68,7 @@ export default {
         })
         .catch(e => {
           this.loading = false;
+          throw e;
         });
     },
     loadMore() {

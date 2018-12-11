@@ -1,9 +1,10 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import BasicLayout from './layouts/BasicLayout.vue';
-import LoginPage from './views/login/index.vue';
-import RegisterPage from './views/login/register.vue';
-import OrderPage from './views/user/order/index.vue';
+
+const BasicLayout = () => import('./layouts/BasicLayout.vue');
+const LoginPage =  () => import('./views/login/index.vue');
+const RegisterPage = () => import('./views/login/register.vue');
+const OrderPage = () => import('./views/user/order/index.vue');
 
 const HomePage = () => import('./views/home/index.vue');
 const UserPage = () => import('./views/user/index.vue');

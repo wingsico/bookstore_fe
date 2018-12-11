@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Toast } from 'vant';
 
 Toast.setDefaultOptions({
-  duration: 1000,
+  duration: 2500,
 })
 
 const codeMessage = {
@@ -71,14 +71,16 @@ export default function request(url, options) {
 
       if (!response) {
         Toast.fail(codeMessage[504]);
-        return;
+        e.message = codeMessage[504];
+        throw e;
       }
 
       const { status, data } = response;
       const errorMessage = data.message || data.error || codeMessage[status];
       e.message = errorMessage;
 
-      return e;
+      Toast(e.message);
+      throw e;
     });
 }
 

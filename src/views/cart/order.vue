@@ -5,7 +5,7 @@
         <h2>商品列表</h2>
         <van-list class="cart-list">
           <CartGood
-            v-for="(good, index) in cartOrder.commodities"
+            v-for="(good, index) in cartOrder.orderCommodities"
             :key="good.book_id"
             :title="good.title"
             :cover_url="good.cover_url"
@@ -38,9 +38,9 @@
         button-text="确认支付"
         class="submit-bar van-hairline--top"
         @submit="showDialog = true"
-        v-if="cartOrder.status !== 2"
+        v-if="!(cartOrder.status === 2)"
       />
-
+      <!-- 不使用 !== 2 防止开始时默认显示而产生闪烁 -->
       <van-popup
         v-model="showDialog"
         position="bottom"
@@ -80,23 +80,32 @@ export default {
   computed: {
     ...mapGetters(["cartOrder", "user"]),
     totalPrice() {
-      return (
-        Number(Number(this.cartOrder.commodities.reduce((acc, cur) => acc + cur.number * cur.price, 0) *
-        100).toFixed(2))
+      return Number(
+        Number(
+          this.cartOrder.orderCommodities.reduce(
+            (acc, cur) => acc + cur.number * cur.price,
+            0
+          ) * 100
+        ).toFixed(2)
       );
     }
   },
   methods: {
-    ...mapActions(['getOrder']),
+    ...mapActions(["getOrder", "getCartGoods", "updateDeposit"]),
     async orderSubmit() {
       this.payLoading = true;
-      await this.$api.order.payOrder({
-        payment: this.value,
-        orderID: this.$route.query.order_id
-      })
-      this.payLoading = false;
-      this.$dialog.alert({ message: '支付成功 '});
-      this.$router.replace('/user/order/finish_list')
+      Promise.all([
+        await this.$api.order.payOrder({
+          orderID: this.cartOrder.orderID,
+          payment: this.value
+        }),
+        await this.getCartGoods(),
+        await this.updateDeposit(),
+      ]).then(() => {
+        this.payLoading = false;
+        this.$dialog.alert({ message: "支付成功 " });
+        this.$router.replace("/user/order/finish_list");
+      });
     },
     onInput(key) {
       this.value = (this.value + key).slice(0, 6);
@@ -106,8 +115,16 @@ export default {
     },
     resetPopup() {
       this.showDialog = false;
-      this.value = '';
+      this.value = "";
       this.payLoading = false;
+    },
+    async fetchOrder() {
+      try {
+        await this.getOrder(this.$route.query.order_id);
+      } catch (e) {
+        this.$toast(e.message);
+        this.$router.replace("/");
+      }
     }
   },
   watch: {
@@ -115,13 +132,12 @@ export default {
       if (value.length === 6) {
         setTimeout(() => {
           this.orderSubmit();
-        }, 300)
+        }, 300);
       }
     }
   },
   created() {
-    console.log(this.$route)
-    this.getOrder(this.$route.query.order_id)
+    this.fetchOrder();
   }
 };
 </script>

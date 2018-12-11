@@ -13,7 +13,7 @@ export default new Vuex.Store({
     recommends: [],
     cartGoods: [],
     cartOrder: {
-      commodities: [],
+      orderCommodities: [],
     },
     classifications: []
   },
@@ -86,8 +86,7 @@ export default new Vuex.Store({
         payload: [...state.cartGoods, data.commodity],
       })
 
-      Dialog.alert({ message: '添加购物车成功' })
-
+      Toast('添加购物车成功')
     },
     setGoodChecked({ commit }, data = {}) {
       commit({
@@ -115,6 +114,14 @@ export default new Vuex.Store({
         Toast(data.message)
       }
 
+    },
+    async deleteCartGood({ dispatch, commit, state }, book_id) {
+      const { cart } = await dispatch('getApi');
+      const res = await cart.deleteGood(book_id);
+      commit({
+        type: SAVE_CART_GOODS,
+        payload: state.cartGoods.filter(({bookID}) => bookID !== book_id),
+      });
     },
     async getCartGoods({ dispatch, commit }) {
       const { cart } = await dispatch('getApi');
@@ -155,12 +162,6 @@ export default new Vuex.Store({
       Toast('注销成功');
       router.push('/login')
     },
-    async updateUserPwd({ commit, dispatch }, password) {
-      const { user } = await dispatch('getApi');
-      const res = await user.updateUserPwd(password);
-      const { data: { message } } = res;
-      Toast(message);
-    },
     async updatePayPwd({ commit, dispatch }, password) {
       const { user } = await dispatch('getApi');
       const res = await user.updatePayPwd(password);
@@ -183,7 +184,7 @@ export default new Vuex.Store({
       const { data: { data } } = res;
       commit({
         type: SAVE_ORDER_LIST,
-        payload: data.orders,
+        payload: data.orders.reverse(),
       })
     },
     async getRecommends({ dispatch, commit }) {
@@ -217,6 +218,18 @@ export default new Vuex.Store({
       commit({
         type: SAVE_CART_ORDER,
         payload: data.order,
+      })
+    },
+    async updateDeposit({ dispatch, commit, state }) {
+      const { user } = await dispatch('getApi');
+      const res = await user.getDeposit();
+      const { data: { data } } = res;
+      commit({
+        type: SAVE_USER,
+        payload: {
+          ...state.user,
+          deposit: data.deposit
+        }
       })
     },
     getApi() {

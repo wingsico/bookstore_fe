@@ -1,6 +1,6 @@
 <template>
   <lazy-component>
-    <div class="cart-good">
+    <v-touch tag="div" class="cart-good" v-on:press="() => deleteDisplay = true" data-no-menu>
       <div class="checked-wrapper" v-if="changable">
         <van-checkbox v-model="propChecked" @change="checkedStatusChange"></van-checkbox>
       </div>
@@ -26,7 +26,15 @@
           </div>
         </div>
       </div>
-    </div>
+      <div v-if="deleteDisplay" class="delete-wrapper">
+        <div class="delete-button button" @click="handleGoodDelete">
+          删除
+        </div>
+        <div class="cancel-button button" @click="deleteDisplay = false">
+          取消
+        </div>
+      </div>
+    </v-touch>
   </lazy-component>
 </template>
 
@@ -48,12 +56,14 @@ export default {
     shadow: {
       type:Boolean,
       default: true,
-    }
+    },
+    id: [String, Number],
   },
   data() {
     return {
       propChecked: this.checked,
-      countValue: this.number
+      countValue: this.number,
+      deleteDisplay: false,
     };
   },
   methods: {
@@ -62,6 +72,10 @@ export default {
     },
     countChange(number) {
       this.$emit("countChange", number, this.index);
+    },
+    handleGoodDelete() {
+      this.deleteDisplay = false;
+      this.$emit("delete", this.id)
     }
   }
 };
@@ -71,6 +85,38 @@ export default {
 .cart-good {
   display: flex;
   align-items: center;
+  position: relative;
+
+  .delete-wrapper {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .button {
+      width: 50px;
+      height: 50px;
+      text-align: center;
+      line-height: 50px;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 14px;
+      margin: 0 20px;
+    }
+
+    .delete-button {
+      background-color: #e4393c;
+    }
+
+    .cancel-button {
+      background-color: gold;
+    }
+  }
   .shadow {
     box-shadow: 2px 0px 10px #ddd;
   }

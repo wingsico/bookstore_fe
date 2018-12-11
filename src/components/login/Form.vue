@@ -1,25 +1,23 @@
 <template>
   <div class="login-form">
-    <van-cell-group
-      class="form-group"
-      :border="false"
-    >
-      <van-field
-        v-model="username"
-        placeholder="请输入用户名"
-        class="username-input input"
-      />
+    <van-cell-group class="form-group" :border="false">
+      <van-field v-model="username" placeholder="请输入用户名" class="username-input input"/>
 
       <van-field
         v-model="password"
         :type="passwordInputType"
         placeholder="请输入密码"
         class="password-input input"
+        @keyup.enter="handleUserLogin"
       >
         <div slot="icon" class="password-right">
-          <van-icon :name="passwordViewIconName" class="view-icon" @click="handlePasswordViewClick"/>
-          <CommonDivider type="vertical" />
-          <router-link to="/findpwd" class="text">忘记密码</router-link>
+          <van-icon
+            :name="passwordViewIconName"
+            class="view-icon"
+            @click="handlePasswordViewClick"
+          />
+          <CommonDivider type="vertical"/>
+          <div class="text" @click="$toast('暂无修改密码入口，请重新注册')">忘记密码</div>
         </div>
       </van-field>
 
@@ -32,9 +30,7 @@
           :disabled="loginButtonDisabled"
           @click="handleUserLogin"
           :loading="logining"
-        >
-          登 录
-        </van-button>
+        >登 录</van-button>
         <van-button
           type="danger"
           round
@@ -42,11 +38,8 @@
           size="large"
           class="button"
           @click="$router.push('/register')"
-        >
-          一键注册
-        </van-button>
+        >一键注册</van-button>
       </van-cell-group>
-
     </van-cell-group>
   </div>
 </template>
@@ -79,10 +72,18 @@ export default {
   methods: {
     ...mapActions([ 'login' ]),
     async handleUserLogin() {
+      this.setLoginingStatus(true);
       const {username, password, $router} = this;
-      await this.login({username,password})
-      this.$toast('登录成功');
-      $router.push('/user')
+      try {
+        await this.login({username,password})
+        this.$toast('登录成功');
+        this.$router.push('/user');
+      } catch(e) {
+        throw e;
+      } finally {
+        this.setLoginingStatus(false)
+      }
+
     },
     setLoginingStatus(status = false) {
       this.logining = status;
@@ -95,7 +96,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 .login-form {
   padding: 25px;
   .van-cell:not(:last-child)::after {
@@ -126,12 +126,12 @@ export default {
     }
 
     .login-button {
-      background: linear-gradient(90deg,#f10000,#ff2000 73%,#ff4f18);
+      background: linear-gradient(90deg, #f10000, #ff2000 73%, #ff4f18);
     }
 
     .van-button--disabled {
       opacity: 1;
-      background: linear-gradient(90deg,#fab3b3,#ffbcb3 73%,#ffcaba);
+      background: linear-gradient(90deg, #fab3b3, #ffbcb3 73%, #ffcaba);
       border: none;
     }
   }
@@ -139,10 +139,9 @@ export default {
   .password-right {
     display: inline-flex;
     align-items: center;
-      font-size: 14px;
+    font-size: 14px;
     .view-icon {
       display: inline-block;
-
     }
     .text {
       color: #222;
@@ -150,7 +149,4 @@ export default {
     }
   }
 }
-
-
-
 </style>

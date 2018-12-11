@@ -6,7 +6,7 @@
     <van-tabbar v-model="active" class="tabbar" v-if="displayTabbar" @change="backToTop">
       <van-tabbar-item icon="home" to="/" replace>首页</van-tabbar-item>
       <van-tabbar-item icon="cart" to="/cart" :info="goodsCount">购物车</van-tabbar-item>
-      <van-tabbar-item icon="contact" to="/user">{{ userTabBarName }}</van-tabbar-item>
+      <van-tabbar-item icon="contact" :to="userRouteUrl">{{ userTabBarName }}</van-tabbar-item>
     </van-tabbar>
   </div>
 </template>
@@ -46,6 +46,9 @@ export default {
     ...mapGetters(["user", "cartGoods"]),
     userTabBarName() {
       return !isEmpty(this.user) ? "我的" : "未登录";
+    },
+    userRouteUrl() {
+      return !isEmpty(this.user) ? "/user" : "/login";
     },
     displayTabbar() {
       const tabbar = Object.keys(map);
