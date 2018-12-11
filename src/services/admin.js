@@ -9,7 +9,7 @@ function addBook(book) {
 
 function getAllOrders(status) {
     return request('/api/admin/allOrders', {
-        method: 'POST',
+        method: 'GET',
         params: {
             status
         }
@@ -19,7 +19,7 @@ function getAllOrders(status) {
 function updateStatus(orderID, status) {
     return request('/api/admin/updateStatus', {
         method: 'POST',
-        params: {
+        data: {
             orderID,
             status
         }
@@ -35,7 +35,7 @@ function getAllUsers() {
 function query(username) {
     return request('/api/admin/query', {
         method: 'POST',
-        params: {
+        data: {
             username
         }
     })

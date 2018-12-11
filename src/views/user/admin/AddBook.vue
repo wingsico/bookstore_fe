@@ -31,7 +31,7 @@
                      label="作者信息" placeholder="请输入作者信息" rows="1" autosize></van-field>
 
           <van-field v-model="kind" required disabled
-                     label="书的类别" placeholder="请点击下拉箭头选择书的类别" icon="arrow-down" @click-icon="handleClassClick"></van-field>
+                     label="书的类别" placeholder="请点击下拉箭头选择书的类别" icon="arrow-down" @click-icon="handleClassClick" />
           <van-popup v-model="classShow" position="bottom" :overlay="true">
             <van-picker show-toolbar title="请选择书的类别" :columns="classification"
                         @cancel="onCancel" @confirm="onConfirm" />

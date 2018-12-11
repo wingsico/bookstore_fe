@@ -2,14 +2,32 @@
   <div class="all-order">
     <commonNavbarLayout title="查看订单">
       <div class="container">
-        <van-tabs v-model="active" @click="queryOrders">
-          <van-tab v-for="(item, index) in tabs" :title="item" :key="index">
+        <van-tabs
+          v-model="active"
+          @click="queryOrders"
+        >
+          <van-tab
+            v-for="(item, index) in tabs"
+            :title="item"
+            :key="index"
+          >
             <div class="order-list">
-              <OrderItem v-for="order in orders" :key="order.orderID" :goods="order.orderCommodities"
-                         :status="order.status" :id="order.orderID" :isLink="true" />
-                <div class="empty-order-wrapper" v-if="orders.length === 0">
-                  暂无该类订单
-                </div>
+              <OrderItem
+                v-for="order in orders"
+                :key="order.orderID"
+                :goods="order.orderCommodities"
+                :status="order.status"
+                :id="order.orderID"
+                :isLink="false"
+                :isAdmin="true"
+                @statusChange="handleStatusChange"
+              />
+              <div
+                class="empty-order-wrapper"
+                v-if="orders.length === 0"
+              >
+                暂无该类订单
+              </div>
             </div>
           </van-tab>
         </van-tabs>
@@ -38,7 +56,6 @@ export default {
         .getAllOrders(status)
         .then(res => {
           this.orders = res.data.data.orders;
-          console.log(this.orders);
         })
         .catch(err => {
           console.log(err);
@@ -52,8 +69,8 @@ export default {
         this.getAllOrders(index);
       }
     },
-    statusChange(index) {
-      this.falseOrders[index].status = 2;
+    handleStatusChange(status, id) {
+      this.orders.find(({orderID}) => orderID === id).status = status;
     },
     formatDate(date) {
       return moment(date).format("YYYY-MM-DD hh:mm:ss");

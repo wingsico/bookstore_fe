@@ -2,8 +2,13 @@
   <div class="order-item" @click="redirectHandler">
     <div class="order-box">
       <div class="order-id van-hairline--bottom">
-        <span class="label">订单号：</span>
-        <span class="content">{{ id }}</span>
+        <div class="id-number">
+          <span class="label">订单号：</span>
+          <span class="content">{{ id }}</span>
+        </div>
+        <div class="admin-change" v-if="isAdmin">
+          <van-button type="danger" size="small" @click="statusChange">修改订单状态</van-button>
+        </div>
       </div>
       <div class="order-info van-hairline--bottom">
         <div class="order-status">
@@ -47,12 +52,25 @@ export default {
     isLink: {
       type: Boolean,
       default: true
+    },
+    isAdmin: {
+        type: Boolean,
+        default: true
     }
   },
   methods: {
     redirectHandler() {
       if (this.isLink) {
         this.$router.push(this.redirectUrl);
+      }
+    },
+    async statusChange() {
+      let newStatus = this.status === 1 ? 2 : 1;
+      try {
+        await this.$api.admin.updateStatus(this.id, newStatus);
+        this.$emit('statusChange', newStatus, this.id)
+      } catch(e) {
+        throw e;
       }
     }
   },
@@ -91,10 +109,14 @@ export default {
     .order-id {
       height: 44px;
       display: flex;
+      justify-content: space-between;
       font-size: 14px;
       line-height: 44px;
       color: #999;
       position: relative;
+      .admin-change {
+        margin-right: 15px;
+      }
     }
 
     .label {
