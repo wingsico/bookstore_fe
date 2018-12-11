@@ -3,36 +3,13 @@
     <commonNavbarLayout title="查看订单">
       <div class="container">
         <van-tabs v-model="active" @click="queryOrders">
-          <van-tab v-for="(item, index) in tabs" :title=item :key=index>
-            <div class="order" v-for="(item, index) in orders" :key=index>
-              <van-row class="orderInfo">
-                <van-row class="firstRow">
-                  <van-col span="18">订单时间：{{formatDate(item.date)}}</van-col>
-                  <van-col span="6">订单号：{{item.orderID}}</van-col>
-                </van-row>
-                <van-row class="secondRow">
-                  <van-col span="18">用户名：{{item.username}}</van-col>
-                  <van-col span="6">用户ID：{{item.userID}}</van-col>
-                </van-row>
-                <van-row class="thirdRow">
-                  <van-col class="orderImage" span="6">
-                    <img :src="item.orderCommodities[0].cover_url">
-                  </van-col>
-                  <van-col class="orderContent" span="18">
-                    {{item.orderCommodities[0].title}}等  
-                  </van-col>
-                </van-row>
-              </van-row>
-              <van-row class="modifyStatus" type="flex" justify="space-between" align="center">
-                <van-col>
-                  订单状态：
-                  <span v-if="item.status === 1">待付款</span>
-                  <span v-else>已完成</span>
-                </van-col>
-                <van-col>
-                  <van-button type="danger" size="small" @click="statusChange(index)">修改状态</van-button>
-                </van-col>
-              </van-row>
+          <van-tab v-for="(item, index) in tabs" :title="item" :key="index">
+            <div class="order-list">
+              <OrderItem v-for="order in orders" :key="order.orderID" :goods="order.orderCommodities"
+                         :status="order.status" :id="order.orderID" :isLink="true" />
+                <div class="empty-order-wrapper" v-if="orders.length === 0">
+                  暂无该类订单
+                </div>
             </div>
           </van-tab>
         </van-tabs>
@@ -52,7 +29,7 @@ export default {
     return {
       active: 0,
       tabs: ["全部订单", "待付款订单", "已完成订单"],
-      orders: [],
+      orders: []
     };
   },
   methods: {
@@ -69,7 +46,7 @@ export default {
         });
     },
     queryOrders(index, title) {
-      if(index === 0) {
+      if (index === 0) {
         this.getAllOrders();
       } else {
         this.getAllOrders(index);
@@ -79,7 +56,7 @@ export default {
       this.falseOrders[index].status = 2;
     },
     formatDate(date) {
-        return moment(date).format('YYYY-MM-DD hh:mm:ss');
+      return moment(date).format("YYYY-MM-DD hh:mm:ss");
     }
   },
   computed: {
@@ -99,40 +76,15 @@ export default {
 
 <style lang="scss" scoped>
 .container {
-  .order {
-    background-color: #EBEEF5;
-    font-size: 14px;
-    padding: 0 7px;
-    margin: 10px 3px 0;
-    border-radius: 5px;
-    .orderInfo {
-      border-bottom: 1px solid #FFF;
-      .firstRow {
-        padding: 5px 0;
-        border-bottom: 1px solid #FFF;
-      }
-      .secondRow {
-        padding: 5px 0;
-      }
-      .thirdRow {
-        padding: 7px 0;
-        .orderImage {
-          img {
-            height: 70px;
-          }
-        }
-        .orderContent {
-          height: 70px;
-          display: flex;
-          align-items: center;
-        }
-      }
-    }
-    .modifyStatus {
-      padding: 5px;
-      font-size: 16px;
-      font-family: 黑体;
-      color: #409EFF;
+  .order-list {
+    background: #f7f7f7;
+    .empty-order-wrapper {
+      font-size: 14px;
+      margin-top: 10px;
+      font-weight: 400;
+      color: #ccc;
+      text-align: center;
+      background: #fff;
     }
   }
 }
