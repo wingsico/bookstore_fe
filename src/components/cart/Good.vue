@@ -17,11 +17,12 @@
             </div>
             <van-stepper
               v-model="countValue"
+              @overlimit="handleStepperOverLimit"
               @change="countChange"
-              max="99"
+              :min="1"
+              :max="quota"
               :integer="true"
               :disabled="!changable"
-              :disable-input="true"
             />
           </div>
         </div>
@@ -64,6 +65,7 @@ export default {
       propChecked: this.checked,
       countValue: this.number,
       deleteDisplay: false,
+      quota: 99,
     };
   },
   methods: {
@@ -71,12 +73,23 @@ export default {
       this.$emit("checkedChange", status, this.index);
     },
     countChange(number) {
+      if (number > this.quota) {
+        this.$toast(`最多单次购买${this.quota}本书籍`);
+        return;
+      }
       this.$emit("countChange", number, this.index);
     },
     handleGoodDelete() {
       this.deleteDisplay = false;
       this.$emit("delete", this.id)
-    }
+    },
+    handleStepperOverLimit(action) {
+      if(action === "minus") {
+        this.$toast("至少选择一本书籍")
+      } else {
+        this.$toast(`最多单次购买${this.quota}本书籍`)
+      }
+    },
   }
 };
 </script>
@@ -106,7 +119,7 @@ export default {
       border-radius: 50%;
       color: #fff;
       font-size: 14px;
-      margin: 0 20px;
+      margin: 0 40px;
     }
 
     .delete-button {

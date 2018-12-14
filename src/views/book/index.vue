@@ -64,8 +64,6 @@
         :goods="goods"
         :goods-id="book.id"
         :hide-stock="sku.hide_stock"
-        @add-cart="addCartGood"
-        @buy-clicked="handleBuyNow"
       >
         <div slot="sku-stepper" class="sku-stepper">
           <div class="sku-info">
@@ -80,6 +78,10 @@
           </div>
           <div class="quota-info">单次限购{{quota}}本书籍</div>
         </div>
+        <div class="sku-actions" slot="sku-actions">
+          <van-button size="large" type="danger" @click="addCartGood">加入购物车</van-button>
+        </div>
+        <div slot="sku-messages"></div>
       </van-sku>
 
       <CommonRecommendList :border="true"/>

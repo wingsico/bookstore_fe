@@ -103,20 +103,20 @@ export default {
     ...mapActions(["getOrder", "getCartGoods", "updateDeposit", "clearCartOrder"]),
     async orderSubmit() {
       this.payLoading = true;
-      Promise.all([
-        this.$api.order.payOrder({
+      try{
+        await this.$api.order.payOrder({
           orderID: this.cartOrder.orderID,
           payment: this.value
-        }),
-        this.getCartGoods(),
-        this.updateDeposit(),
-      ]).then(() => {
+        });
+        await this.getCartGoods();
+        await this.updateDeposit();
         this.$dialog.alert({ message: "支付成功 " });
         this.$router.replace("/user/order/finish_list");
-      }).catch(e => {
+      } catch(e) {
         this.showDialog = false;
-      })
-      this.payLoading = false;
+      } finally {
+        this.payLoading = false;
+      }
     },
     onInput(key) {
       this.value = (this.value + key).slice(0, 6);

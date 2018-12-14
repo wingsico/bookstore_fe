@@ -5,7 +5,9 @@
       <div class="container">
         <div class="user-wrapper">
           <div class="user-card shadow">
-            <div class="user-avatar">{{ AvatarChar }}</div>
+            <div class="user-avatar">
+              <span>{{ avatarChar }}</span>
+            </div>
             <div class="user-info">
               <p class="nickname">{{ user.nickname }}</p>
               <p class="username">用户名: {{ user.username }}</p>
@@ -20,6 +22,12 @@
                 <span>账号设置</span>
               </div>
             </router-link>
+            <router-link class="admin-entry" tag="div" to="/user/admin" v-if="isAdmin">
+              <div class="admin-wrapper">
+                <van-icon name="setting"/>
+                <span>后台管理</span>
+              </div>
+            </router-link>
           </div>
         </div>
         <div class="cell-group">
@@ -28,10 +36,20 @@
               <UserCellItem name="debit-pay" color="gold" text="待付款" to="/user/order/pay_list"/>
             </van-col>
             <van-col span="8" class="col">
-              <UserCellItem name="cash-on-deliver" color="gold" text="待收货" @click="handleNoService" />
+              <UserCellItem
+                name="cash-on-deliver"
+                color="gold"
+                text="待收货"
+                @click="handleNoService"
+              />
             </van-col>
             <van-col span="8" class="col">
-              <UserCellItem name="goods-collect" color="gold" text="已完成" to="/user/order/finish_list"/>
+              <UserCellItem
+                name="goods-collect"
+                color="gold"
+                text="已完成"
+                to="/user/order/finish_list"
+              />
             </van-col>
             <van-col span="8" class="last col">
               <UserCellItem name="description" color="red" text="全部订单" to="/user/order/all_list"/>
@@ -39,8 +57,7 @@
           </van-row>
         </div>
         <div class="recommends-wrapper">
-        <CommonRecommendList />
-
+          <CommonRecommendList/>
         </div>
       </div>
     </CommonNavbarLayout>
@@ -55,11 +72,15 @@ export default {
   name: "user-page",
   computed: {
     ...mapGetters(["user"]),
-    AvatarChar() {
+    avatarChar() {
       return this.user.nickname && this.user.nickname.slice(0, 1);
     },
     showRouterView() {
-      return this.$route.fullPath !== '/user'
+      return this.$route.fullPath !== "/user";
+    },
+    isAdmin() {
+      console.log(this.user);
+      return this.user.role === "admin" ? true : false;
     }
   },
   methods: {
@@ -67,12 +88,12 @@ export default {
       this.$router.go(-1);
     },
     handleNoService(e) {
-      this.$toast('暂无此服务')
+      this.$toast("暂无此服务");
     }
   },
   created() {
     if (isEmpty(this.user)) {
-      this.$router.replace('/login');
+      this.$router.replace("/login");
     }
   }
 };
@@ -149,6 +170,25 @@ export default {
             }
           }
         }
+        .admin-entry {
+          position: absolute;
+          right: 15px;
+          bottom: 0px;
+          height: 40px;
+          line-height: 40px;
+          overflow: hidden;
+          .admin-wrapper {
+            position: relative;
+            color: rgba(76, 0, 0, 0.7);
+            font-size: 12px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            span {
+              margin-left: 5px;
+            }
+          }
+        }
         .user-avatar {
           width: 60px;
           height: 60px;
@@ -157,15 +197,23 @@ export default {
           align-items: center;
           background: pink;
           color: #fff;
-          border: 1px solid hsla(0, 0%, 100%, 0.4);
+          border: 1px solid hsla(0, 18%, 73%, 0.4);
           border-radius: 60px;
           box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
           overflow: hidden;
           font-size: 40px;
+          span {
+            display: inline-flex;
+            align-items: center;
+          }
         }
         .user-info {
-          flex: 1;
           margin-left: 20px;
+          display: flex;
+          height: 100%;
+          padding: 10px 0;
+          flex-direction: column;
+          justify-content: space-between;
           .nickname {
             color: #fff;
             font-size: 14px;
@@ -182,19 +230,19 @@ export default {
             background: #c8483f;
             border-radius: 10px;
             color: #fff;
-            display: inline-block;
+            display: inline-flex;
             font-size: 10px;
-            // height: 15px;
-            // line-height: 16px;
             margin-right: 5px;
             margin-top: 4px;
-            padding: 4px 8px;
+            padding: 2px 8px;
             text-align: center;
+            max-width: 70px;
+            align-items: center;
+            justify-content: center;
             .icon {
               vertical-align: middle;
             }
             span {
-              vertical-align: middle;
               margin-left: 4px;
             }
           }

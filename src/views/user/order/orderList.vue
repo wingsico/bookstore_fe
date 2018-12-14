@@ -6,6 +6,7 @@
       :goods="order.orderCommodities"
       :status="order.status"
       :id="order.orderID"
+      :date="order.date"
     />
     <div class="empty-order-wrapper" v-if="orderListByStatus.length === 0">
       暂无该类订单

@@ -2,13 +2,34 @@
   <div class="order-item" @click="redirectHandler">
     <div class="order-box">
       <div class="order-id van-hairline--bottom">
-        <span class="label">订单号：</span>
-        <span class="content">{{ id }}</span>
+        <div class="id-number">
+          <div class="block">
+            <span class="label">订单号：</span>
+            <span class="content">{{ id }}</span>
+            <br>
+          </div>
+          <div class="block">
+            <label class="label">订单时间：</label>
+            <time class="time content">{{ orderDate }}</time>
+          </div>
+        </div>
+        <div class="admin-change" v-if="isAdmin">
+          <van-button
+            type="danger"
+            size="small"
+            @click="statusChange"
+            :loading="changeLoading"
+          >修改订单状态</van-button>
+        </div>
       </div>
       <div class="order-info van-hairline--bottom">
         <div class="order-status">
           <span class="label">状态：</span>
           <span :class="['content', statusClass]">{{ statusText }}</span>
+        </div>
+        <div class="order-user">
+          <span class="label">用户名：</span>
+          <span class="content">{{ username }}</span>
         </div>
         <div class="order-price">
           <span class="label">总价：</span>
@@ -38,21 +59,46 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
+import moment from "moment";
+
 export default {
   name: "order-item",
   props: {
     id: Number,
     status: Number,
     goods: Array,
+    username: String,
+    date: [Date, String],
     isLink: {
       type: Boolean,
       default: true
+    },
+    isAdmin: {
+      type: Boolean,
+      default: false
     }
+  },
+  data() {
+    return {
+      changeLoading: false
+    };
   },
   methods: {
     redirectHandler() {
       if (this.isLink) {
         this.$router.push(this.redirectUrl);
+      }
+    },
+    async statusChange() {
+      let newStatus = this.status === 1 ? 2 : 1;
+      try {
+        this.changeLoading = true;
+        await this.$api.admin.updateStatus(this.id, newStatus);
+        this.$emit("statusChange", newStatus, this.id);
+      } catch (e) {
+        throw e;
+      } finally {
+        this.changeLoading = false;
       }
     }
   },
@@ -75,6 +121,9 @@ export default {
     },
     redirectUrl() {
       return `/cart/order?order_id=${this.id}`;
+    },
+    orderDate() {
+      return moment(this.date).format("YYYY-MM-DD hh:mm:ss");
     }
   }
 };
@@ -89,12 +138,19 @@ export default {
     margin-bottom: 15px;
     background: #fff;
     .order-id {
-      height: 44px;
       display: flex;
+      justify-content: space-between;
       font-size: 14px;
-      line-height: 44px;
+      padding: 10px 0;
       color: #999;
       position: relative;
+      .admin-change {
+        margin-right: 15px;
+      }
+
+      .id-number {
+        line-height: 1.5;
+      }
     }
 
     .label {
@@ -140,10 +196,6 @@ export default {
         }
 
         .status-finish {
-          color: #e93b3d;
-        }
-
-        .status-get {
           color: #3eaf7c;
         }
       }
